@@ -1,0 +1,17 @@
+{
+  "name": "bdv-claude-marketplace",
+  "owner": {
+    "name": "By Dr. Vali",
+    "email": "sumit@bydrvali.com"
+  },
+  "plugins": [
+    {
+      "name": "bdv-podcast",
+      "source": "./plugins/bdv-podcast",
+      "description": "Production toolkit for The 360 with Dr. Vali podcast — scriptwriting, reviewing, reference pulling, virality monitoring, and topic mapping.",
+      "version": "0.1.0",
+      "category": "content",
+      "keywords": ["podcast", "scriptwriting", "bdv", "the-360", "dr-vali"]
+    }
+  ]
+}
