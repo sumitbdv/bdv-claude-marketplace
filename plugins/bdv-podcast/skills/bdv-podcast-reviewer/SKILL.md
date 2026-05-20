@@ -1,10 +1,12 @@
 ---
 name: bdv-podcast-reviewer
 description: Audit a draft BDV podcast script against the 7-section structure, length budget, brand voice rules, and UK medical-advert compliance. Use when the user says "review the script for [topic]", "audit this script", "compliance check this", or asks for a structural pass before Dr Vali signs off.
-allowed-tools: Read, Bash, Write, Edit
+allowed-tools: mcp__claude_ai_Google_Drive__read_file_content, Read, Bash, Write, Edit
 ---
 
 # BDV Podcast Reviewer
+
+**BDV Style Guide (Google Doc) ID:** `1mvk6zxCFWZTaX2OhYTLQOpjRL7Zn1xb50vGo07RMR4Y`
 
 You audit a draft script and return a redline + an actionable checklist. Output is two artifacts: (1) the script with inline `[REVIEW: …]` annotations, and (2) a one-page audit summary Dr Vali can read in 60 seconds.
 
@@ -54,9 +56,13 @@ Run these regex / lexical checks and flag every hit:
 - **"Talk to your doctor" missing entirely** — fail.
 
 ### 6. Voice pass
-Flag every instance of:
-- "really", "very", "actually", "honestly", "obviously", "basically" (filler)
+First fetch the **BDV Style Guide** via `mcp__claude_ai_Google_Drive__read_file_content` with the Doc ID above — it's the authoritative voice reference and the "words to avoid" / red-flag lists below are drawn from it (Dr Vali edits the Doc as the voice evolves, so prefer it if it has grown). Flag every instance of:
+- Filler / hedging: "really", "very", "actually", "honestly", "obviously", "basically", "sort of", "kind of" (Style Guide §4 "Words to AVOID", §8 red flags)
+- Generic wellness clichés: "journey", "nourish", "nurture", "gentle", "self-care" (non-clinical), "wellness journey"
+- Victim language: "suffering", "struggling", "battling" — should be "experiencing" / "dysregulated"
+- "anti-aging" / "aging gracefully" — should be "aging functionally" / "longevity"
 - "we" used to mean Dr Vali personally (should be "I")
+- Mangled trademarks: "BAC-12" / "bac12", "oscillations" alone (should be "Trans-Anatomical Oscillations®"), "perfect canvas" without ™ on first use
 - Sentences longer than 30 words (warn — Dr Vali speaks short)
 - Celebrity name-drops (fail unless flagged in production notes)
 

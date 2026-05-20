@@ -7,6 +7,7 @@ allowed-tools: mcp__claude_ai_Google_Drive__read_file_content, Read, Bash, Write
 # BDV Podcast Scriptwriter
 
 **Live taxonomy Sheet ID:** `1xeS5sYkRsyivUfaeTwxj4dr0e1ep3_B5EuvXSv1FQSg`
+**BDV Style Guide (Google Doc) ID:** `1mvk6zxCFWZTaX2OhYTLQOpjRL7Zn1xb50vGo07RMR4Y`
 
 You draft a teleprompter-ready episode script in Dr. Shawana Vali's voice. The output is camera-ready: 7 sections, 8–12 minutes (target 1,400–1,800 words at her pace of ~150 wpm), one case study, two-persona CTAs.
 
@@ -29,9 +30,11 @@ If the format isn't specified, infer from the topic + lab mapping:
 
    Column positions may vary between sub-sections / labs (the Sheet is hand-edited and authors can add columns). Match by header label, not by hardcoded index. The Sub-Section column contains short keywords like `MODALITY` / `SYMPTOM` / `VIRAL`; the cell to its right is the Topic.
 
-2. **Reference pack** (if one exists at `./outputs/references-<topic-slug>-*.md`). Read it. Use the verbatim quotes only to position Dr. Vali — do not let competitor framing dominate the script.
+2. **The BDV Style Guide.** Always fetch it before writing — call `mcp__claude_ai_Google_Drive__read_file_content` with the Style Guide Doc ID above. This is the authoritative voice reference: signature phrases, sentence-structure templates, the 10 reusable brand-voice patterns, vocabulary banks (power words to use / words to avoid), trademark usage rules (BAC12®, CUTIS®, AUYÓ, Trans-Anatomical Oscillations®, "Uses Your Cells to Fix You™"), and the red-flag anti-patterns. The voice rules in the section below are a summary — the Style Guide Doc is the source of truth, and it's the thing Dr. Vali edits when the voice evolves, so honour it over this file if they ever conflict.
 
-If neither (1) nor (2) is available, ask once: "Should I pull references first via `pull references for <topic>`, or write from the taxonomy entry alone?"
+3. **Reference pack** (if one exists at `./outputs/references-<topic-slug>-*.md`). Read it. Use the verbatim quotes only to position Dr. Vali — do not let competitor framing dominate the script.
+
+If neither the taxonomy entry (1) nor a reference pack (3) is available, ask once: "Should I pull references first via `pull references for <topic>`, or write from the taxonomy entry alone?" The Style Guide (2) should be fetched regardless.
 
 If the Drive MCP returns an auth error, tell the user to run `/mcp` in Claude Code and authenticate `claude.ai Google Drive`.
 
@@ -79,7 +82,13 @@ Then one cliffhanger line teasing next week's episode.
 
 ## Brand voice rules
 
-- **Sentences short.** Dr Vali speaks in short, declarative sentences. Read the strategy doc voice guide if you're not sure.
+These are the load-bearing rules. The full **BDV Style Guide** (fetched in input step 2) expands every one of them with verbatim examples — when in doubt, match the patterns and signature phrases there.
+
+- **Sentences short.** Dr Vali speaks in short, declarative, often staccato sentences. Use the symptom-list fragment pattern: "Testosterone's tanked. Energy? Gone. Brain fog."
+- **Lead inside-out.** Never discuss aesthetics (outside) without internal health (hormones/gut/brain) first.
+- **Fierce, not soft.** No "spa" / wellness-cliché language ("nourish", "gentle", "journey"). Validate through diagnosis, not emotion ("You're not broken. You're dysregulated.").
+- **Trademarks exact.** BAC12® (never BAC-12), CUTIS®, AUYÓ, Trans-Anatomical Oscillations®, "Uses Your Cells to Fix You™", The Perfect Canvas™ — first mention carries the ®/™.
+- **"aging functionally"**, never "aging gracefully" or "anti-aging".
 - **"Inside out."** Recurring brand phrase. Use it naturally where relevant.
 - **No filler.** Cut "really", "very", "actually", "honestly", "obviously."
 - **No "we" royal.** When Dr Vali means herself, she says "I." When she means BDV, she says "the BDV protocol."
