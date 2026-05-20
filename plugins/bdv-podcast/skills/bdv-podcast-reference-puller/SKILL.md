@@ -1,10 +1,12 @@
 ---
 name: bdv-podcast-reference-puller
 description: Pull verbatim quotes, transcripts and citations from competitor creators on a given topic, scoped to the BDV taxonomy's Knowledge and Lifestyle tier creators. Use when the user says "pull references for [topic]", "what did the competitors say about [topic]", "what did [creator] say about [topic]", or asks for citation packs / transcript snippets before scripting. Pulls from YouTube (yt-dlp captions), Apple/Spotify (Whisper), and Instagram/TikTok (Apify).
-allowed-tools: Read, Bash, Write, WebFetch, WebSearch
+allowed-tools: mcp__claude_ai_Google_Drive__read_file_content, Read, Bash, Write, WebFetch, WebSearch
 ---
 
 # BDV Podcast Reference Puller
+
+**Live taxonomy Sheet ID:** `1xeS5sYkRsyivUfaeTwxj4dr0e1ep3_B5EuvXSv1FQSg`
 
 You assemble a citation pack for a podcast topic so Nina can write the script without spending 2 hours hunting transcripts. Output is a structured markdown brief with verbatim quotes, source links, and creator metadata.
 
@@ -19,9 +21,10 @@ Trigger phrases:
 
 ## Sources, in priority order
 
-1. **Taxonomy creators first.** Read `${CLAUDE_PLUGIN_ROOT}/data/taxonomy.xlsx` (use `${CLAUDE_PLUGIN_ROOT}/scripts/read_taxonomy.py --lab <auto-detect>`) to find which Knowledge-tier and Lifestyle-tier creators are tagged for the topic. Start with their channels.
+1. **Taxonomy creators first.** Call `mcp__claude_ai_Google_Drive__read_file_content` with the Sheet ID above. Read the auto-saved file if reported. Find the topic's lab section and the topic row; collect the Creator 1/2/3 Episode references attached to it. Start with their channels.
    - Knowledge tier: Dr. Idriss, Dr. Anthony Youn, Beauty Brains, Inside Aesthetics, Grant Stevens, William Gaunitz, Gary Brecka, Darshan Shah, Mark Hyman, Gabrielle Lyon, etc.
    - Lifestyle tier: Susan Yara, Arielle Lorre, Jason Martin, Saluja/Novo, Dr. Louise Newson, Mel Robbins, Iman Gadzhi, TSK, Kayla Barnes, Tamsen Fadal, etc.
+   - If the Drive MCP returns an auth error, tell the user to run `/mcp` and authenticate `claude.ai Google Drive`.
 2. **Then YouTube broadly** via `yt-dlp` for captions. Search query: `<topic> <creator>`.
 3. **Then podcasts** (Apple/Spotify) via Whisper transcription if no YouTube version exists.
 4. **Then short-form** (IG/TikTok) via Apify if user explicitly asks for "viral takes".
@@ -30,10 +33,7 @@ Trigger phrases:
 
 1. **Disambiguate the lab.** Map the topic to a lab using the taxonomy. Skin/Face/Hair/Body/Wellness. If ambiguous, ask once.
 
-2. **Pull the creator list.**
-   ```bash
-   python3 "${CLAUDE_PLUGIN_ROOT}/scripts/read_taxonomy.py" --lab "<lab>" | python3 -c "import json,sys;d=json.load(sys.stdin);[print(r['topic'],'->',','.join(r['creators'])) for r in d['rows']]"
-   ```
+2. **Pull the creator list** from the live Sheet (see step 1 source). For each topic row in the lab's section, the Creator 1 / Creator 2 / Creator 3 Episode cells contain the relevant references.
 
 3. **For each tagged creator, fetch transcripts.** Use the helper:
    ```bash

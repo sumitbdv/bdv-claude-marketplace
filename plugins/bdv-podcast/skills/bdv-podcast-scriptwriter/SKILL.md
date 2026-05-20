@@ -1,10 +1,12 @@
 ---
 name: bdv-podcast-scriptwriter
 description: Draft a full 8-12 minute podcast script for The 360 with Dr. Vali, in her on-camera voice, following the 7-section structure (Opening Hook, Education, Evidence, Case Study, Questions To Ask Your Doctor, BDV Verdict, Closing Hook). Use when the user says "write the script for [topic]", "draft an episode on [topic]", "scriptwriter [topic]", or asks for a podcast script anchored on the BDV format. Consumes outputs of bdv-podcast-reference-puller and bdv-podcast-topic-mapper.
-allowed-tools: Read, Bash, Write
+allowed-tools: mcp__claude_ai_Google_Drive__read_file_content, Read, Bash, Write
 ---
 
 # BDV Podcast Scriptwriter
+
+**Live taxonomy Sheet ID:** `1xeS5sYkRsyivUfaeTwxj4dr0e1ep3_B5EuvXSv1FQSg`
 
 You draft a teleprompter-ready episode script in Dr. Shawana Vali's voice. The output is camera-ready: 7 sections, 8–12 minutes (target 1,400–1,800 words at her pace of ~150 wpm), one case study, two-persona CTAs.
 
@@ -23,18 +25,15 @@ If the format isn't specified, infer from the topic + lab mapping:
 
 ## Inputs you should pull first
 
-1. **Topic context from the taxonomy:**
-   ```bash
-   python3 "${CLAUDE_PLUGIN_ROOT}/scripts/read_taxonomy.py" --lab "<lab>" \
-     | python3 -c "import json,sys,os;d=json.load(sys.stdin);t='<topic>'.lower();[print(json.dumps(r,indent=2)) for r in d['rows'] if t in r['topic'].lower()]"
-   ```
-   This gives you the opening hook, Dr Vali notes, mechanism, sub-topics, and tagged creators.
+1. **Topic context from the live taxonomy Sheet.** Call `mcp__claude_ai_Google_Drive__read_file_content` with the Sheet ID above. If the tool reports the response was saved to a file (the Sheet is ≈85 KB), `Read` that path. Find the lab's section (banner rows look like `| LLAS \| SKIN LAB \| ... |`), then locate the topic row. Pull: Opening Hook, Dr Vali Notes, Clinical Mechanism, Sub-Topics, tagged Creator references.
+
+   Column positions may vary between sub-sections / labs (the Sheet is hand-edited and authors can add columns). Match by header label, not by hardcoded index. The Sub-Section column contains short keywords like `MODALITY` / `SYMPTOM` / `VIRAL`; the cell to its right is the Topic.
 
 2. **Reference pack** (if one exists at `./outputs/references-<topic-slug>-*.md`). Read it. Use the verbatim quotes only to position Dr. Vali — do not let competitor framing dominate the script.
 
-3. **Strategy excerpts:** Read `${CLAUDE_PLUGIN_ROOT}/data/strategy.docx` only if you need to verify a brand rule. Don't read it for every script — too much context.
-
 If neither (1) nor (2) is available, ask once: "Should I pull references first via `pull references for <topic>`, or write from the taxonomy entry alone?"
+
+If the Drive MCP returns an auth error, tell the user to run `/mcp` in Claude Code and authenticate `claude.ai Google Drive`.
 
 ## The 7-section structure (non-negotiable)
 

@@ -1,26 +1,30 @@
 ---
-description: One-time setup to run the BDV virality monitor as a scheduled remote agent every Monday 07:00 UK
+description: One-time setup to register the two Monday-morning BDV scheduled agents (lab virality + longevity/biohacking)
 ---
 
-# Setup weekly virality schedule
+# Setup weekly schedules
 
-This command registers a remote scheduled agent (Claude Code routine) that runs the BDV virality monitor for all five labs every Monday at 07:00 UK and saves the briefs to `outputs/` (and posts to Slack if `SLACK_WEBHOOK_URL` is configured).
+This command registers two remote scheduled agents that fire every Monday at **06:00 UTC** (≈07:00 BST London / 06:00 GMT in winter — cron is UTC and has no DST awareness):
+
+1. **`bdv-virality-monday`** — runs the `bdv-podcast-virality-monitor` skill across all five BDV labs (Skin, Face, Hair, Body, Wellness), pulling live from the taxonomy Google Sheet. Emails the briefs to `sumit@bydrvali.com` via the Gmail MCP.
+2. **`bdv-longevity-monday`** — broader trend scan in longevity, biohacking, NAD/peptides, supplements, hormesis, gut health, sleep optimization, cold/heat therapy. No Sheet dependency. Emails a digest to `sumit@bydrvali.com` via the Gmail MCP.
 
 ## What you need first
 
-- Claude Code logged in with an Anthropic account that has `/schedule` enabled.
-- `yt-dlp` installed (`brew install yt-dlp` on macOS).
-- Optional but recommended: `pip3 install pytrends openai` for Google Trends and Whisper fallback.
-- Optional: `SLACK_WEBHOOK_URL` in env if you want the briefs posted to a channel.
+- A claude.ai account with `/schedule` enabled.
+- These connectors connected on claude.ai (Settings → Connectors): **Google Drive** (for the Sheet), **Gmail** (for delivery). Both should already be connected.
 
-## What I will do for you
+That's it. No local installs needed — the routines run remotely in Anthropic's cloud.
 
-1. Use the `/schedule` skill to register a routine named `bdv-virality-monday`.
-2. Cron: `0 7 * * 1` (Monday 07:00 UK — adjust if the runtime is UTC; the routine accepts a `timezone: Europe/London` field).
-3. Prompt the routine runs each Monday: "Run the bdv-podcast-virality-monitor for each of the five labs (Skin, Face, Hair, Body, Wellness). Save each brief to outputs/. If SLACK_WEBHOOK_URL is set, post each brief's headline + top 3 topics to Slack."
+## What this command does
 
-After this command, the routine is live. List it with `/schedule list`. Cancel with `/schedule delete bdv-virality-monday`.
+When invoked, this command calls `/schedule` to create both routines with:
+- `cron_expression: "0 6 * * 1"`
+- `model: claude-sonnet-4-6`
+- `mcp_connections`: Google Drive + Gmail attached to routine #1; Gmail attached to routine #2
 
-## On-demand fallback
+After creation, list with `/schedule list`. Delete via https://claude.ai/code/routines.
 
-If `/schedule` is unavailable on your plan, you can run the monitor locally on a cron via the `/loop` skill: `/loop 7d /bdv-podcast-virality-monitor all-labs`. This only fires while Claude Code is open, so the remote schedule is preferred.
+## To skip auto-create
+
+If you'd rather schedule manually, just say `/schedule` in Claude Code and follow the prompts using the cron + prompts above.

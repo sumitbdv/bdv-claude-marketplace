@@ -1,10 +1,12 @@
 ---
 name: bdv-podcast-virality-monitor
 description: Surface what's trending this week in a BDV lab (Skin, Face, Hair, Body, Wellness) — used to feed the Viral Topic episode slot and to time evergreen episodes against rising waves. Use when the user says "what is trending in [lab] this week", "viral topics in [lab]", "what's hot in [lab]", or asks for a weekly trend brief. Also runs automatically every Monday 07:00 UK as a scheduled remote agent (see commands/setup-weekly-schedule.md).
-allowed-tools: Read, Bash, Write, WebFetch, WebSearch
+allowed-tools: mcp__claude_ai_Google_Drive__read_file_content, Read, Bash, Write, WebFetch, WebSearch
 ---
 
 # BDV Podcast Virality Monitor
+
+**Live taxonomy Sheet ID:** `1xeS5sYkRsyivUfaeTwxj4dr0e1ep3_B5EuvXSv1FQSg`
 
 You produce a weekly trend brief, scoped to one BDV lab. Output is a ranked list of topics with velocity signals, creator citations, and a "BDV angle" recommendation per topic.
 
@@ -33,12 +35,9 @@ Don't fail the whole brief if one source is unavailable — note it and continue
 
 1. **Confirm the lab.** If the trigger phrase doesn't name one, ask.
 
-2. **Pull the lab's vocabulary** from the taxonomy:
-   ```bash
-   python3 "${CLAUDE_PLUGIN_ROOT}/scripts/read_taxonomy.py" --lab "<lab>" \
-     | python3 -c "import json,sys;d=json.load(sys.stdin);[print(r['topic']) for r in d['rows']]"
-   ```
-   Use those topic names as your seed search vocabulary plus the lab's symptom keywords (acne, melasma, alopecia, perimenopause, libido, GLP-1, exosomes, peptides, etc.).
+2. **Pull the lab's vocabulary** from the live taxonomy Sheet. Call `mcp__claude_ai_Google_Drive__read_file_content` with the Sheet ID above, find the chosen lab's section, and collect every topic name and sub-topic keyword. Use those as your seed search vocabulary plus general lab keywords (acne, melasma, alopecia, perimenopause, libido, GLP-1, exosomes, peptides, etc.).
+
+   If the tool reports the response was auto-saved to a file, `Read` that path. If it returns an auth error, tell the user to run `/mcp` and authenticate `claude.ai Google Drive`.
 
 3. **Pull signals** via:
    ```bash
